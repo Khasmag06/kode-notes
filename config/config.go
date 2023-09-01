@@ -20,8 +20,9 @@ type Config struct {
 
 type (
 	ServerConfig struct {
-		Host string `env:"SERVER_HOST"`
-		Port string `env:"SERVER_PORT"`
+		Host    string `env:"HTTP_HOST"`
+		Port    string `env:"HTTP_PORT"`
+		Address string
 	}
 
 	PGConfig struct {
@@ -58,16 +59,6 @@ type (
 	}
 )
 
-//func NewConfig() (*Config, error) {
-//	cfg := Config{}
-//	err := env.Parse(&cfg)
-//	if err != nil {
-//		return nil, fmt.Errorf("failed to parse config from environment variables: %w", err)
-//	}
-//
-//	return &cfg, nil
-//}
-
 func NewConfig() (*Config, error) {
 	err := godotenv.Load()
 	if err != nil {
@@ -76,8 +67,9 @@ func NewConfig() (*Config, error) {
 
 	cfg := Config{
 		Server: ServerConfig{
-			Host: getKey("SERVER_HOST"),
-			Port: getKey("SERVER_PORT"),
+			Address: fmt.Sprintf("%s:%s", getKey("HTTP_HOST"), getKey("HTTP_PORT")),
+			Host:    getKey("HTTP_HOST"),
+			Port:    getKey("HTTP_PORT"),
 		},
 		PG: PGConfig{
 			User:     getKey("POSTGRES_USER"),
@@ -136,3 +128,14 @@ func parseIntEnv(key string) int {
 	}
 	return val
 }
+
+//func NewConfig() (*Config, error) {
+//	cfg := Config{}
+//	err := env.Parse(&cfg)
+//	cfg.Server.Address = fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port)
+//	if err != nil {
+//		return nil, fmt.Errorf("failed to parse config from environment variables: %w", err)
+//	}
+//
+//	return &cfg, nil
+//}
