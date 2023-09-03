@@ -60,7 +60,14 @@ func (s *service) DeleteNote(ctx context.Context, userID int, noteID int) error 
 }
 
 func (s *service) GetAllNotes(ctx context.Context, userID int) ([]models.Note, error) {
-	return s.repo.GetAllNotes(ctx, userID)
+	notes, err := s.repo.GetAllNotes(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if notes == nil {
+		return []models.Note{}, nil
+	}
+	return notes, nil
 }
 
 func (s *service) GetNote(ctx context.Context, userID int, noteID int) (models.Note, error) {
