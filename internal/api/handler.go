@@ -24,7 +24,6 @@ type Handler struct {
 const (
 	noteIsEmptyErr   = "Заметка не может быть пустой!"
 	invalidNoteIdErr = "Невалидный параметр noteId"
-	noteIdNotExists  = "Не указан noteId"
 )
 
 func NewHandler(auth authService, noteService NoteService, decoder decoder, logger Logger, speller speller) http.Handler {
@@ -49,10 +48,10 @@ func NewHandler(auth authService, noteService NoteService, decoder decoder, logg
 			r.Group(func(r chi.Router) {
 				r.Use(h.authMiddleware)
 				r.Post("/create", h.CreateNote)
-				r.Put("/update", h.UpdateNote)
-				r.Delete("/delete", h.DeleteNote)
+				r.Put("/update/{note_id}", h.UpdateNote)
+				r.Delete("/delete/{note_id}", h.DeleteNote)
 				r.Get("/get-all", h.GetAllNotes)
-				r.Get("/get", h.GetNote)
+				r.Get("/get/{note_id}", h.GetNote)
 			})
 		})
 	})
@@ -80,14 +79,21 @@ func (h *Handler) CheckSpellingNote(note models.Note) error {
 }
 
 func parseNoteId(noteIdQuery string) (int, error) {
-	if noteIdQuery == "" {
-		return 0, businessErr.NewBusinessError(noteIdNotExists)
-	}
-
 	noteId, err := strconv.Atoi(noteIdQuery)
 	if err != nil {
 		return 0, businessErr.NewBusinessError(invalidNoteIdErr)
 	}
+	if noteId == 0 {
+		return 0, businessErr.NewBusinessError(invalidNoteIdErr)
+	}
 
 	return noteId, nil
+}
+
+func checkRequestData(note models.Note) error {
+	if note.Title == "" && note.Content == "" {
+		return businessErr.NewBusinessError(noteIsEmptyErr)
+	}
+
+	return nil
 }

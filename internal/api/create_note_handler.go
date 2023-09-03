@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/Khasmag06/kode-notes/internal/models"
-	businessErr "github.com/Khasmag06/kode-notes/pkg/app_err"
 	response "github.com/Khasmag06/kode-notes/pkg/http"
 	"net/http"
 )
@@ -19,7 +18,7 @@ func (h *Handler) CreateNote(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	if err := checkCreateRequestData(note); err != nil {
+	if err := checkRequestData(note); err != nil {
 		response.WriteErrorResponse(w, h.logger, err)
 		return
 	}
@@ -37,12 +36,4 @@ func (h *Handler) CreateNote(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.WriteSuccessResponse(w, nil)
-}
-
-func checkCreateRequestData(note models.Note) error {
-	if note.Title == "" && note.Content == "" {
-		return businessErr.NewBusinessError(noteIsEmptyErr)
-	}
-
-	return nil
 }

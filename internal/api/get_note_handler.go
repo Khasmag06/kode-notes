@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"github.com/go-chi/chi/v5"
 	"net/http"
 
 	response "github.com/Khasmag06/kode-notes/pkg/http"
@@ -12,7 +13,7 @@ func (h *Handler) GetNote(w http.ResponseWriter, r *http.Request) {
 
 	ctx := context.Background()
 
-	noteId, err := parseNoteId(r.URL.Query().Get("noteId"))
+	noteId, err := parseNoteId(chi.URLParam(r, "note_id"))
 	if err != nil {
 		response.WriteErrorResponse(w, h.logger, err)
 		return

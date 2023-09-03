@@ -4,21 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/Khasmag06/kode-notes/internal/models"
+	"github.com/go-chi/chi/v5"
 	"net/http"
 
-	businessErr "github.com/Khasmag06/kode-notes/pkg/app_err"
 	response "github.com/Khasmag06/kode-notes/pkg/http"
 )
 
 func (h *Handler) UpdateNote(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(userIdParam).(int)
 	var note models.Note
-	urlParam, err := parseNoteId(r.URL.Query().Get("noteId"))
-	if err != nil {
-		response.WriteErrorResponse(w, h.logger, err)
-		return
-	}
-	note.ID = urlParam
+	noteId, err := parseNoteId(chi.URLParam(r, "note_id"))
+	note.ID = noteId
 
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&note); err != nil {
@@ -27,7 +23,7 @@ func (h *Handler) UpdateNote(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	err = checkUpdateRequestNote(note)
+	err = checkRequestData(note)
 	if err != nil {
 		response.WriteErrorResponse(w, h.logger, err)
 		return
@@ -47,15 +43,4 @@ func (h *Handler) UpdateNote(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.WriteSuccessResponse(w, nil)
-}
-
-func checkUpdateRequestNote(note models.Note) error {
-	if note.ID == 0 {
-		return businessErr.NewBusinessError(noteIsEmptyErr)
-	}
-	if note.Title == "" && note.Content == "" {
-		return businessErr.NewBusinessError(noteIsEmptyErr)
-	}
-
-	return nil
 }
