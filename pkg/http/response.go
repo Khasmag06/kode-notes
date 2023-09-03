@@ -69,7 +69,17 @@ func WriteErrorResponse(w http.ResponseWriter, logger logger, err error) {
 
 		logger.Warn(err)
 
-		WriteJSONResponse(w, http.StatusBadRequest, errorResponse)
+		statusCode := http.StatusBadRequest
+		switch bErr.Code() {
+		case "UnauthorizedError":
+			statusCode = http.StatusUnauthorized
+		case "AuthorizationError":
+			statusCode = http.StatusUnauthorized
+		case "ConflictError":
+			statusCode = http.StatusConflict
+		}
+
+		WriteJSONResponse(w, statusCode, errorResponse)
 
 	} else {
 		errorResponse := ErrorResponse{

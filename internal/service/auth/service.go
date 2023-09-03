@@ -39,7 +39,7 @@ func (s *service) SignUp(ctx context.Context, user models.User) error {
 
 	if err = s.repo.CreateUser(ctx, user); err != nil {
 		if errors.Is(err, repo_errs.ErrAlreadyExists) {
-			return app_err.NewAuthorizationError(loginAlreadyExistsErr)
+			return app_err.NewConflictError(loginAlreadyExistsErr)
 		}
 		return err
 	}

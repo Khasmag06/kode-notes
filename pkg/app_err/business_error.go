@@ -33,3 +33,10 @@ func NewUnauthorizedError() error {
 		message: "Вы не авторизованы. Пожалуйста, авторизуйтесь",
 	}
 }
+
+func NewConflictError(message string) error {
+	return BusinessError{
+		code:    "ConflictError",
+		message: message,
+	}
+}
