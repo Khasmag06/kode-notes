@@ -7,8 +7,8 @@ import (
 
 type User struct {
 	Id        int       `json:"-"`
-	Login     string    `json:"login" binding:"required"`
-	Password  string    `json:"password" binding:"required,password,min=8,max=32"`
+	Login     string    `json:"login" binding:"required" format:"string" example:"my_login"`
+	Password  string    `json:"password" binding:"required,password,min=8,max=32" format:"string" example:"Qwerty123!"`
 	CreatedAt time.Time `json:"-"`
 }
 

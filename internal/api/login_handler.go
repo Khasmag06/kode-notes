@@ -9,6 +9,18 @@ import (
 	"strings"
 )
 
+// Login
+// @Tags Auth
+// @Summary Login
+// @Description Create account
+// @ID create-account
+// @Accept  json
+// @Produce json
+// @Param input body models.User true "account info"
+// @Success 200 {object} http.SuccessResponse
+// @Failure 400 {object} http.ErrorResponse
+// @Failure 500 {object} http.ErrorResponse
+// @Router /auth/sign-up [post]
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	var loginReq models.User
 	ctx := context.Background()

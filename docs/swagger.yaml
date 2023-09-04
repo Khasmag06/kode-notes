@@ -1,0 +1,279 @@
+basePath: /api
+definitions:
+  http.Error:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  http.ErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/http.Error'
+      status:
+        type: string
+    type: object
+  http.SuccessResponse:
+    properties:
+      data: {}
+      status:
+        type: string
+    type: object
+  models.Note:
+    properties:
+      content:
+        example: содержание заметки
+        format: string
+        type: string
+      title:
+        example: заголовок заметки
+        format: string
+        type: string
+    type: object
+  models.User:
+    properties:
+      login:
+        example: my_login
+        format: string
+        type: string
+      password:
+        example: Qwerty123!
+        format: string
+        maxLength: 32
+        minLength: 8
+        type: string
+    required:
+    - login
+    - password
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Сервис хранения заметок.
+  title: NoteService API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: login
+      operationId: login
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: SignUp
+      tags:
+      - Auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Create account
+      operationId: create-account
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Login
+      tags:
+      - Auth
+  /note/create:
+    post:
+      consumes:
+      - application/json
+      description: create a new note
+      operationId: createNote
+      parameters:
+      - description: note info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Note'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: create a new note
+      tags:
+      - Note
+  /note/delete/{note_id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete note
+      operationId: deleteNote
+      parameters:
+      - description: ID of the note to delete
+        in: path
+        name: note_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: delete a note
+      tags:
+      - Note
+  /note/get-all:
+    get:
+      consumes:
+      - application/json
+      description: get all notes
+      operationId: getAllNotes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: get all notes
+      tags:
+      - Note
+  /note/get/{note_id}:
+    get:
+      consumes:
+      - application/json
+      description: get note
+      operationId: getNote
+      parameters:
+      - description: ID of the note to retrieve
+        in: path
+        name: note_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: get note
+      tags:
+      - Note
+  /note/update/{note_id}:
+    put:
+      consumes:
+      - application/json
+      description: update note
+      operationId: updateNote
+      parameters:
+      - description: ID of the note to update
+        in: path
+        name: note_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: update note
+      tags:
+      - Note
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: authorization
+    type: apiKey
+swagger: "2.0"

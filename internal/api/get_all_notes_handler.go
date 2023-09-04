@@ -6,6 +6,18 @@ import (
 	"net/http"
 )
 
+// GetAllNotes
+// @Tags Note
+// @Summary get all notes
+// @Description get all notes
+// @ID getAllNotes
+// @Accept  json
+// @Produce json
+// @Success 200 {object} http.SuccessResponse
+// @Failure 400 {object} http.ErrorResponse
+// @Failure 500 {object} http.ErrorResponse
+// @Security ApiKeyAuth
+// @Router /note/get-all [get]
 func (h *Handler) GetAllNotes(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(userIdParam).(int)
 

@@ -10,6 +10,19 @@ import (
 	response "github.com/Khasmag06/kode-notes/pkg/http"
 )
 
+// UpdateNote
+// @Tags Note
+// @Summary update note
+// @Description update note
+// @ID updateNote
+// @Accept  json
+// @Produce json
+// @Param note_id path int64 true "ID of the note to update"
+// @Success 200 {object} http.SuccessResponse
+// @Failure 400 {object} http.ErrorResponse
+// @Failure 500 {object} http.ErrorResponse
+// @Security ApiKeyAuth
+// @Router /note/update/{note_id} [put]
 func (h *Handler) UpdateNote(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(userIdParam).(int)
 	var note models.Note

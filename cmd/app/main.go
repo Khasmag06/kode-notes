@@ -21,6 +21,17 @@ import (
 	"log"
 )
 
+// @Title NoteService API
+// @Description Сервис хранения заметок.
+// @Version 1.0
+
+// @BasePath /api
+// @Host localhost:8080
+
+// @SecurityDefinitions.apikey ApiKeyAuth
+// @In header
+// @Name authorization
+
 func main() {
 	cfg, err := config.NewConfig()
 	if err != nil {

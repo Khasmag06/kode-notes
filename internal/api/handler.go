@@ -2,9 +2,11 @@ package api
 
 import (
 	"fmt"
+	_ "github.com/Khasmag06/kode-notes/docs"
 	"github.com/Khasmag06/kode-notes/internal/models"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 	"net/http"
 	"strconv"
 	"strings"
@@ -38,7 +40,7 @@ func NewHandler(auth authService, noteService NoteService, decoder decoder, logg
 
 	h.Use(middleware.Recoverer)
 	h.Use(middleware.Logger)
-
+	h.Get("/swagger/*", httpSwagger.WrapHandler)
 	h.Route("/api", func(r chi.Router) {
 		r.Route("/auth", func(r chi.Router) {
 			r.Post("/sign-up", h.SignUp)
@@ -55,7 +57,6 @@ func NewHandler(auth authService, noteService NoteService, decoder decoder, logg
 			})
 		})
 	})
-
 	return h
 }
 

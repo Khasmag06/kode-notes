@@ -7,6 +7,19 @@ import (
 	"net/http"
 )
 
+// DeleteNote
+// @Tags Note
+// @Summary delete a note
+// @Description delete note
+// @ID deleteNote
+// @Accept  json
+// @Produce json
+// @Param note_id path int64 true "ID of the note to delete"
+// @Success 200 {object} http.SuccessResponse
+// @Failure 400 {object} http.ErrorResponse
+// @Failure 500 {object} http.ErrorResponse
+// @Security ApiKeyAuth
+// @Router /note/delete/{note_id} [delete]
 func (h *Handler) DeleteNote(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(userIdParam).(int)
 

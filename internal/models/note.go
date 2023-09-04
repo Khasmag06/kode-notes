@@ -1,7 +1,7 @@
 package models
 
 type Note struct {
-	ID      int    `json:"id,omitempty"`
-	Title   string `json:"title"`
-	Content string `json:"content"`
+	ID      int    `json:"-"`
+	Title   string `json:"title" format:"string" example:"заголовок заметки"`
+	Content string `json:"content" format:"string" example:"содержание заметки"`
 }
