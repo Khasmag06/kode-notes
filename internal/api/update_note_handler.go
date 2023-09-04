@@ -29,15 +29,13 @@ func (h *Handler) UpdateNote(w http.ResponseWriter, r *http.Request) {
 	noteId, err := parseNoteId(chi.URLParam(r, "note_id"))
 	note.ID = noteId
 
-	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&note); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&note); err != nil {
 		response.WriteErrorResponse(w, h.logger, err)
 		return
 	}
 	defer r.Body.Close()
 
-	err = checkRequestData(note)
-	if err != nil {
+	if err = h.validator.Struct(note); err != nil {
 		response.WriteErrorResponse(w, h.logger, err)
 		return
 	}

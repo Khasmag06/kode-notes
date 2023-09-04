@@ -10,6 +10,12 @@ import (
 	"strings"
 )
 
+const (
+	unauthorizedError  = "UnauthorizedError"
+	authorizationError = "AuthorizationError"
+	conflictError      = "ConflictError"
+)
+
 type SuccessResponse struct {
 	Status string `json:"status"`
 	Data   any    `json:"data,omitempty"`
@@ -53,7 +59,7 @@ func WriteErrorResponse(w http.ResponseWriter, logger logger, err error) {
 		errorResponse := ErrorResponse{
 			Status: "error",
 			Error: Error{
-				Code:    bErr.Code(),
+				Code:    "ValidationError",
 				Message: combinedErrorMessage,
 			},
 		}
@@ -71,11 +77,11 @@ func WriteErrorResponse(w http.ResponseWriter, logger logger, err error) {
 
 		statusCode := http.StatusBadRequest
 		switch bErr.Code() {
-		case "UnauthorizedError":
+		case unauthorizedError:
 			statusCode = http.StatusUnauthorized
-		case "AuthorizationError":
+		case authorizationError:
 			statusCode = http.StatusUnauthorized
-		case "ConflictError":
+		case conflictError:
 			statusCode = http.StatusConflict
 		}
 

@@ -25,8 +25,12 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	var loginReq models.User
 	ctx := context.Background()
 
-	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&loginReq); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&loginReq); err != nil {
+		response.WriteErrorResponse(w, h.logger, err)
+		return
+	}
+
+	if err := h.validator.Struct(loginReq); err != nil {
 		response.WriteErrorResponse(w, h.logger, err)
 		return
 	}

@@ -31,7 +31,7 @@ func (h *Handler) CreateNote(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	if err := checkRequestData(note); err != nil {
+	if err := h.validator.Struct(note); err != nil {
 		response.WriteErrorResponse(w, h.logger, err)
 		return
 	}

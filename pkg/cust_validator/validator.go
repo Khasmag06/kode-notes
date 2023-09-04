@@ -42,7 +42,7 @@ func GetErrorMsg(fe validator.FieldError) error {
 	case "email":
 		return fmt.Errorf("поле %s должно содержать корректный адрес электронной почты", fe.Field())
 	case "password":
-		return fmt.Errorf("поле %s обязательно должно содержать латинские буквы разного регистрастра, цифры и допускаются символы: %s", fe.Field(), symbols)
+		return fmt.Errorf("поле %s обязательно должно содержать латинские буквы разного регистра, цифры и допускаются символы: %s", fe.Field(), symbols)
 	case "min":
 		return fmt.Errorf("поле %s должно быть не менее %s символов", fe.Field(), fe.Param())
 	case "max":

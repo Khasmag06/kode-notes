@@ -4,8 +4,10 @@ import (
 	"fmt"
 	_ "github.com/Khasmag06/kode-notes/docs"
 	"github.com/Khasmag06/kode-notes/internal/models"
+	"github.com/Khasmag06/kode-notes/pkg/cust_validator"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-playground/validator/v10"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 	"net/http"
 	"strconv"
@@ -16,6 +18,7 @@ import (
 
 type Handler struct {
 	*chi.Mux
+	validator   *validator.Validate
 	authService authService
 	noteService NoteService
 	decoder     decoder
@@ -23,10 +26,7 @@ type Handler struct {
 	speller     speller
 }
 
-const (
-	noteIsEmptyErr   = "Заметка не может быть пустой!"
-	invalidNoteIdErr = "Невалидный параметр noteId"
-)
+const invalidNoteIdErr = "Невалидный параметр noteId"
 
 func NewHandler(auth authService, noteService NoteService, decoder decoder, logger Logger, speller speller) http.Handler {
 	h := Handler{
@@ -36,11 +36,15 @@ func NewHandler(auth authService, noteService NoteService, decoder decoder, logg
 		decoder:     decoder,
 		logger:      logger,
 		speller:     speller,
+		validator:   validator.New(),
 	}
+	_ = h.validator.RegisterValidation("password", cust_validator.PasswordValidate)
 
 	h.Use(middleware.Recoverer)
 	h.Use(middleware.Logger)
+
 	h.Get("/swagger/*", httpSwagger.WrapHandler)
+
 	h.Route("/api", func(r chi.Router) {
 		r.Route("/auth", func(r chi.Router) {
 			r.Post("/sign-up", h.SignUp)
@@ -89,12 +93,4 @@ func parseNoteId(noteIdQuery string) (int, error) {
 	}
 
 	return noteId, nil
-}
-
-func checkRequestData(note models.Note) error {
-	if note.Title == "" && note.Content == "" {
-		return businessErr.NewBusinessError(noteIsEmptyErr)
-	}
-
-	return nil
 }

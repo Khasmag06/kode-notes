@@ -25,8 +25,12 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	var signUpReq models.User
 	ctx := context.Background()
 
-	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&signUpReq); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&signUpReq); err != nil {
+		response.WriteErrorResponse(w, h.logger, err)
+		return
+	}
+
+	if err := h.validator.Struct(signUpReq); err != nil {
 		response.WriteErrorResponse(w, h.logger, err)
 		return
 	}
