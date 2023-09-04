@@ -35,7 +35,7 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	signUpReq.Login = strings.TrimSpace(strings.ToLower(signUpReq.Login))
+	signUpReq.Username = strings.TrimSpace(strings.ToLower(signUpReq.Username))
 
 	if err := h.authService.SignUp(ctx, signUpReq); err != nil {
 		response.WriteErrorResponse(w, h.logger, err)

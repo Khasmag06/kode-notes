@@ -35,7 +35,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	loginReq.Login = strings.TrimSpace(strings.ToLower(loginReq.Login))
+	loginReq.Username = strings.TrimSpace(strings.ToLower(loginReq.Username))
 
 	tokenData, err := h.authService.Login(ctx, loginReq)
 	if err != nil {

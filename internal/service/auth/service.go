@@ -47,7 +47,7 @@ func (s *service) SignUp(ctx context.Context, user models.User) error {
 }
 
 func (s *service) Login(ctx context.Context, loginData models.User) (*models.TokensResponse, error) {
-	user, err := s.repo.GetUserByLogin(ctx, loginData.Login)
+	user, err := s.repo.GetUserByLogin(ctx, loginData.Username)
 	if err != nil {
 		return nil, err
 	}

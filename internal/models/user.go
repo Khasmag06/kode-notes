@@ -7,7 +7,7 @@ import (
 
 type User struct {
 	Id        int       `json:"-"`
-	Login     string    `json:"login" validate:"required" format:"string" example:"my_login"`
+	Username  string    `json:"username" validate:"required" format:"string" example:"my_login"`
 	Password  string    `json:"password" validate:"required,password,min=8,max=32" format:"string" example:"Qwerty123!"`
 	CreatedAt time.Time `json:"-"`
 }

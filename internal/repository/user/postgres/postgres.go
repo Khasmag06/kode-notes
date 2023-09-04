@@ -24,8 +24,8 @@ func New(db *pgxpool.Pool) *repo {
 
 func (r *repo) CreateUser(ctx context.Context, user models.User) error {
 	row := r.pool.QueryRow(ctx,
-		` INSERT INTO users (login, password) 
-                   VALUES($1, $2) RETURNING id`, user.Login, user.Password)
+		` INSERT INTO users (username, password) 
+                   VALUES($1, $2) RETURNING id`, user.Username, user.Password)
 
 	var id int
 
@@ -45,13 +45,13 @@ func (r *repo) CreateUser(ctx context.Context, user models.User) error {
 
 func (r *repo) GetUserByLogin(ctx context.Context, login string) (*models.User, error) {
 	row := r.pool.QueryRow(ctx,
-		`	SELECT id, login, password, created_at
+		`	SELECT id, username, password, created_at
 			      FROM users
-			     WHERE login = $1`, login)
+			     WHERE username = $1`, login)
 
 	var user models.User
 
-	err := row.Scan(&user.Id, &user.Login, &user.Password, &user.CreatedAt)
+	err := row.Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil
