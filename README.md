@@ -71,7 +71,7 @@ curl --location --request POST 'http://localhost:8080/api/auth/sign-up' \
 curl --location --request POST 'http://localhost:8080/api/auth/login' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "login":"exampe@mail.ru",
+    "login":"userlogin",
     "password":"Qwerty123!"
 }'
 ```
@@ -108,7 +108,7 @@ curl --location --request POST 'http://localhost:8080/api/note/create' \
 
 Получение одной заметки пользователем:
 ```curl
-curl --location --request GET 'http://localhost:8080/api/note/get?noteId=1' \
+curl --location --request GET 'http://localhost:8080/api/note/get/1' \
 --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiJldVhzNzRiUnNqNHZKS2RWck4vT0tpOWxyRjZpT3NPZFNwMDNVT0U9In0.GvsuCvrPxq7EbGZE1zHMgvMZiKZymo6FF7m6xt-zIXw'
 ```
 Пример ответа:
@@ -153,7 +153,7 @@ curl --location --request GET 'http://localhost:8080/api/note/get-all' \
 
 Обновление заметки пользователя:
 ```curl
-curl --location --request PUT 'http://localhost:8080/api/note/update?noteId=1' \
+curl --location --request PUT 'http://localhost:8080/api/note/update/1' \
 --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiJldVhzNzRiUnNqNHZKS2RWck4vT0tpOWxyRjZpT3NPZFNwMDNVT0U9In0.GvsuCvrPxq7EbGZE1zHMgvMZiKZymo6FF7m6xt-zIXw' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -172,7 +172,7 @@ curl --location --request PUT 'http://localhost:8080/api/note/update?noteId=1' \
 
 Удаление заметки пользователя:
 ```curl
-curl --location --request DELETE 'http://localhost:8080/api/note/delete?noteId=1' \
+curl --location --request DELETE 'http://localhost:8080/api/note/delete/1' \
 --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiJldVhzNzRiUnNqNHZKS2RWck4vT0tpOWxyRjZpT3NPZFNwMDNVT0U9In0.GvsuCvrPxq7EbGZE1zHMgvMZiKZymo6FF7m6xt-zIXw' \
 --header 'Content-Type: application/json' \
 --data-raw '{
