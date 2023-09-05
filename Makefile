@@ -31,4 +31,4 @@ cover: ### run test with coverage
 .PHONY: coverage
 
 swag: ### generate swagger docs
-	swag init -g cmd/app/main.go --parseInternal --parseDependency
+	swag init -g cmd/app/main.go

@@ -13,10 +13,11 @@ type service struct {
 	apiURL string
 }
 
-func New() *service {
+func New(url string) *service {
 	return &service{
 		client: &http.Client{},
-		apiURL: "https://speller.yandex.net/services/spellservice.json/checkText"}
+		apiURL: url,
+	}
 }
 
 func (s *service) CheckText(text string) ([]models.SpellError, error) {

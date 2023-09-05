@@ -54,7 +54,7 @@ func main() {
 
 	redisDB, err := redis.ConnectRedis(ctx, cfg.Redis)
 	if err != nil {
-		log.Println(err)
+		logger.Fatal(err)
 	}
 
 	jwt, err := jwt2.New(cfg.JWT.SignKey)
@@ -74,7 +74,7 @@ func main() {
 	noteRepo := noteRepository.New(db.Pool)
 	noteCache := noteRepoWithCache.New(redisDB, noteRepo, logger)
 	noteService := note.New(noteCache)
-	yandexSpeller := speller.New()
+	yandexSpeller := speller.New(cfg.Speller.URL)
 
 	r := api.NewHandler(authService, noteService, decoder, logger, yandexSpeller)
 

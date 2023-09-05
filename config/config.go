@@ -16,6 +16,7 @@ type Config struct {
 	Hasher  HasherConfig
 	Decoder DecoderConfig
 	Logger  LoggerConfig
+	Speller SpellerConfig
 }
 
 type (
@@ -56,6 +57,9 @@ type (
 	LoggerConfig struct {
 		LogFilePath string `env:"LOG_FILE_PATH"`
 		Level       string `env:"LOG_LVL"`
+	}
+	SpellerConfig struct {
+		URL string `env:"SPELLER_URL"`
 	}
 )
 
@@ -98,6 +102,7 @@ func NewConfig() (*Config, error) {
 			LogFilePath: getKey("LOG_FILE_PATH"),
 			Level:       getKey("LOG_LVL"),
 		},
+		Speller: SpellerConfig{getKey("SPELLER_URL")},
 	}
 
 	return &cfg, nil
