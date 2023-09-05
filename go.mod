@@ -6,6 +6,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/go-playground/validator/v10 v10.15.1
 	github.com/golang-jwt/jwt/v5 v5.0.0
+	github.com/golang/mock v1.6.0
 	github.com/jackc/pgerrcode v0.0.0-20220416144525-469b46aa5efa
 	github.com/jackc/pgx/v5 v5.4.3
 	github.com/joho/godotenv v1.5.1
@@ -36,7 +37,6 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
-	github.com/swaggo/http-swagger/example/go-chi v0.0.0-20230830153024-537f045bded0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sync v0.2.0 // indirect
