@@ -1,6 +1,15 @@
 version: "3.8"
 
 services:
+  app:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+    restart: unless-stopped
 
   postgres:
     image: postgres
@@ -11,29 +20,6 @@ services:
     ports:
       - "5433:5432"
     restart: unless-stopped
-
-  app:
-    build: .
-    env_file:
-      - .env
-    ports:
-      - "8080:8080"
-    depends_on:
-      - migrations
-      - redis
-    restart: unless-stopped
-
-  migrations:
-    image: migrate/migrate
-    env_file:
-      - .env
-    volumes:
-      - ./migrations:/migrations
-    command: [ "-path", "/migrations", "-database",
-               "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=${POSTGRES_SSL_MODE}", "up" ]
-    depends_on:
-      - postgres
-    restart: on-failure
 
   redis:
     image: redis:latest

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"github.com/Khasmag06/kode-notes/config"
 	"github.com/Khasmag06/kode-notes/internal/api"
 	noteRepoWithCache "github.com/Khasmag06/kode-notes/internal/repository/note/cache"
@@ -16,9 +17,11 @@ import (
 	logger2 "github.com/Khasmag06/kode-notes/pkg/logger"
 	"github.com/Khasmag06/kode-notes/pkg/postgres"
 	"github.com/Khasmag06/kode-notes/pkg/redis"
-	"net/http"
-
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"log"
+	"net/http"
 )
 
 // @Title NoteService API
@@ -38,6 +41,16 @@ func main() {
 		log.Fatal(err)
 	}
 
+	m, err := migrate.New("file://migrations", cfg.PG.URL)
+	if err != nil {
+		log.Fatalf("could not start sql migration... %v", err)
+	}
+	defer func() { _, _ = m.Close() }()
+
+	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		log.Fatalf("Migrate: up error: %v", err)
+	}
+
 	logger, err := logger2.New(cfg.Logger.LogFilePath, cfg.Logger.Level)
 	if err != nil {
 		log.Fatalf("failed to build logger: %s", err)
@@ -48,13 +61,13 @@ func main() {
 
 	db, err := postgres.NewDB(ctx, cfg.PG)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Fatalf("failed to connect to postgres db: %s", err)
 	}
 	defer db.Close()
 
 	redisDB, err := redis.ConnectRedis(ctx, cfg.Redis)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Fatalf("failed to connect to postgres redis db: %s", err)
 	}
 
 	jwt, err := jwt2.New(cfg.JWT.SignKey)
@@ -66,7 +79,11 @@ func main() {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	hasher := hasher2.New(cfg.Hasher.Salt)
+
+	hasher, err := hasher2.New(cfg.Hasher.Salt)
+	if err != nil {
+		logger.Fatal(err)
+	}
 
 	authRepo := authRepository.New(db.Pool)
 	authService := auth.New(authRepo, hasher, jwt, decoder)
@@ -77,6 +94,6 @@ func main() {
 	yandexSpeller := speller.New(cfg.Speller.URL)
 
 	r := api.NewHandler(authService, noteService, decoder, logger, yandexSpeller)
-
+	logger.Info("Starting http server...")
 	logger.Fatal(http.ListenAndServe(cfg.Server.Port, r))
 }
