@@ -27,6 +27,7 @@ type (
 	}
 
 	PGConfig struct {
+		URL      string
 		User     string `env:"POSTGRES_USER"`
 		Password string `env:"POSTGRES_PASSWORD"`
 		Host     string `env:"POSTGRES_HOST"`
@@ -71,9 +72,8 @@ func NewConfig() (*Config, error) {
 
 	cfg := Config{
 		Server: ServerConfig{
-			Address: fmt.Sprintf("%s:%s", getKey("HTTP_HOST"), getKey("HTTP_PORT")),
-			Host:    getKey("HTTP_HOST"),
-			Port:    getKey("HTTP_PORT"),
+			Host: getKey("HTTP_HOST"),
+			Port: getKey("HTTP_PORT"),
 		},
 		PG: PGConfig{
 			User:     getKey("POSTGRES_USER"),
@@ -104,7 +104,14 @@ func NewConfig() (*Config, error) {
 		},
 		Speller: SpellerConfig{getKey("SPELLER_URL")},
 	}
-
+	cfg.Server.Address = fmt.Sprintf("%s%s", cfg.Server.Host, cfg.Server.Port)
+	cfg.PG.URL = fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s",
+		cfg.PG.User,
+		cfg.PG.Password,
+		cfg.PG.Host,
+		cfg.PG.Port,
+		cfg.PG.DB,
+		cfg.PG.SSLMode)
 	return &cfg, nil
 }
 
