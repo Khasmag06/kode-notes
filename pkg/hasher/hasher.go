@@ -1,6 +1,7 @@
 package hasher
 
 import (
+	"errors"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -9,10 +10,11 @@ type Hasher struct {
 	salt string
 }
 
-func New(salt string) *Hasher {
-	return &Hasher{
-		salt: salt,
+func New(salt string) (*Hasher, error) {
+	if salt == "" {
+		return nil, errors.New("salt cannot be an empty string")
 	}
+	return &Hasher{salt: salt}, nil
 }
 
 func (h *Hasher) HashPassword(password string) (string, error) {

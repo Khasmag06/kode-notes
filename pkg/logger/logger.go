@@ -27,6 +27,7 @@ func New(logFilePath, level string) (*Logger, error) {
 	}
 
 	config := zap.NewProductionConfig()
+	//config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	config.EncoderConfig.TimeKey = "timestamp"
 	config.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout("Jan 02 15:04:05")
 	config.EncoderConfig.CallerKey = zapcore.OmitKey
@@ -63,6 +64,9 @@ func (l *Logger) Error(args ...any) {
 }
 func (l *Logger) Fatal(args ...any) {
 	l.logger.Fatal(args)
+}
+func (l *Logger) Fatalf(format string, args ...any) {
+	l.logger.Fatalf(format, args)
 }
 
 func (l *Logger) Sync() error {
