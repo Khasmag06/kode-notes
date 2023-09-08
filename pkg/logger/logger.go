@@ -56,11 +56,15 @@ func (l *Logger) Debug(args ...any) {
 func (l *Logger) Info(args ...any) {
 	l.logger.Info(args)
 }
+
 func (l *Logger) Warn(args ...any) {
 	l.logger.Warn(args)
 }
 func (l *Logger) Error(args ...any) {
 	l.logger.Error(args)
+}
+func (l *Logger) Errorf(format string, args ...any) {
+	l.logger.Errorf(format, args)
 }
 func (l *Logger) Fatal(args ...any) {
 	l.logger.Fatal(args)

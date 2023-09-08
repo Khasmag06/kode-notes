@@ -13,16 +13,18 @@ import (
 	"github.com/Khasmag06/kode-notes/internal/service/speller"
 	decoder2 "github.com/Khasmag06/kode-notes/pkg/decoder"
 	hasher2 "github.com/Khasmag06/kode-notes/pkg/hasher"
+	"github.com/Khasmag06/kode-notes/pkg/httpserver"
 	jwt2 "github.com/Khasmag06/kode-notes/pkg/jwt"
-	logger2 "github.com/Khasmag06/kode-notes/pkg/logger"
+	"github.com/Khasmag06/kode-notes/pkg/logger"
 	"github.com/Khasmag06/kode-notes/pkg/postgres"
 	"github.com/Khasmag06/kode-notes/pkg/redis"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"log"
-	"net"
-	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 // @Title NoteService API
@@ -52,54 +54,68 @@ func main() {
 		log.Fatalf("Migrate: up error: %v", err)
 	}
 
-	logger, err := logger2.New(cfg.Logger.LogFilePath, cfg.Logger.Level)
+	l, err := logger.New(cfg.Logger.LogFilePath, cfg.Logger.Level)
 	if err != nil {
 		log.Fatalf("failed to build logger: %s", err)
 	}
-	defer func() { _ = logger.Sync() }()
+	defer func() { _ = l.Sync() }()
 
 	ctx := context.Background()
 
 	db, err := postgres.NewDB(ctx, cfg.PG)
 	if err != nil {
-		logger.Fatalf("failed to connect to postgres db: %s", err)
+		l.Fatalf("failed to connect to postgres db: %s", err)
 	}
 	defer db.Close()
 
 	redisDB, err := redis.ConnectRedis(ctx, cfg.Redis)
 	if err != nil {
-		logger.Fatalf("failed to connect to postgres redis db: %s", err)
+		l.Fatalf("failed to connect to postgres redis db: %s", err)
 	}
 
 	jwt, err := jwt2.New(cfg.JWT.SignKey)
 	if err != nil {
-		logger.Fatal(err)
+		l.Fatal(err)
 	}
 
 	decoder, err := decoder2.New(cfg.Decoder.SecretKey)
 	if err != nil {
-		logger.Fatal(err)
+		l.Fatal(err)
 	}
 
 	hasher, err := hasher2.New(cfg.Hasher.Salt)
 	if err != nil {
-		logger.Fatal(err)
+		l.Fatal(err)
 	}
 
 	authRepo := authRepository.New(db.Pool)
 	authService := auth.New(authRepo, hasher, jwt, decoder)
 
 	noteRepo := noteRepository.New(db.Pool)
-	noteCache := noteRepoWithCache.New(redisDB, noteRepo, logger)
+	noteCache := noteRepoWithCache.New(redisDB, noteRepo, l)
 	noteService := note.New(noteCache)
 	yandexSpeller := speller.New(cfg.Speller.URL)
 
-	r := api.NewHandler(authService, noteService, decoder, logger, yandexSpeller)
+	// HTTP Server
+	l.Info("Starting http server...")
+	handler := api.NewHandler(authService, noteService, decoder, l, yandexSpeller)
+	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
 
-	server := http.Server{
-		Addr:    net.JoinHostPort("", cfg.Server.Port),
-		Handler: r,
+	// Waiting signal
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+
+	select {
+	case s := <-interrupt:
+		l.Info("app - Run - signal: " + s.String())
+	case err = <-httpServer.Notify():
+		l.Errorf("app - Run - httpServer.Notify: %w", err)
 	}
-	logger.Info("Starting http server...")
-	logger.Fatal(server.ListenAndServe())
+
+	// Shutdown
+	err = httpServer.Shutdown()
+	if err != nil {
+		l.Errorf("app - Run - httpServer.Shutdown: %w", err)
+	}
+
 }

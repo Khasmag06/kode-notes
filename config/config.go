@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-	Server  ServerConfig
+	HTTP    HTTPConfig
 	PG      PGConfig
 	Redis   RedisConfig
 	JWT     JWTConfig
@@ -18,7 +18,7 @@ type Config struct {
 }
 
 type (
-	ServerConfig struct {
+	HTTPConfig struct {
 		Host    string `env:"HTTP_HOST" yaml:"host"`
 		Port    string `env:"HTTP_PORT" yaml:"port"`
 		Address string
