@@ -69,60 +69,30 @@ func NewConfig() (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to load .env file: %w", err)
 	}
+	cfg := &Config{}
 
-	cfg := Config{
-		Server: ServerConfig{
-			Host: getKey("HTTP_HOST"),
-			Port: getKey("HTTP_PORT"),
-		},
-		PG: PGConfig{
-			User:     getKey("POSTGRES_USER"),
-			Password: getKey("POSTGRES_PASSWORD"),
-			Host:     getKey("POSTGRES_HOST"),
-			Port:     parseUint16Env("POSTGRES_PORT"),
-			DB:       getKey("POSTGRES_DB"),
-			SSLMode:  getKey("POSTGRES_SSL_MODE"),
-		},
-		Redis: RedisConfig{
-			Host:     getKey("REDIS_HOST"),
-			Port:     getKey("REDIS_PORT"),
-			Password: getKey("REDIS_PASSWORD"),
-			DB:       parseIntEnv("REDIS_DB"),
-		},
-		JWT: JWTConfig{
-			SignKey: getKey("JWT_SIGN_KEY"),
-		},
-		Hasher: HasherConfig{
-			Salt: getKey("HASHER_SALT"),
-		},
-		Decoder: DecoderConfig{
-			SecretKey: getKey("SECRET_KEY"),
-		},
-		Logger: LoggerConfig{
-			LogFilePath: getKey("LOG_FILE_PATH"),
-			Level:       getKey("LOG_LVL"),
-		},
-		Speller: SpellerConfig{getKey("SPELLER_URL")},
-	}
+	cfg.Server.Host = os.Getenv("HTTP_HOST")
+	cfg.Server.Port = os.Getenv("HTTP_PORT")
 	cfg.Server.Address = fmt.Sprintf("%s%s", cfg.Server.Host, cfg.Server.Port)
+	cfg.PG.User = os.Getenv("POSTGRES_USER")
+	cfg.PG.Password = os.Getenv("POSTGRES_PASSWORD")
+	cfg.PG.Host = os.Getenv("POSTGRES_HOST")
+	cfg.PG.Port = parseUint16Env("POSTGRES_PORT")
+	cfg.PG.DB = os.Getenv("POSTGRES_DB")
+	cfg.PG.SSLMode = os.Getenv("POSTGRES_SSL_MODE")
 	cfg.PG.URL = fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s",
-		cfg.PG.User,
-		cfg.PG.Password,
-		cfg.PG.Host,
-		cfg.PG.Port,
-		cfg.PG.DB,
-		cfg.PG.SSLMode)
-	return &cfg, nil
-}
-
-func getKey(key string) string {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Println("Error loading .env file")
-		return ""
-	}
-
-	return os.Getenv(key)
+		cfg.PG.User, cfg.PG.Password, cfg.PG.Host, cfg.PG.Port, cfg.PG.DB, cfg.PG.SSLMode)
+	cfg.Redis.Host = os.Getenv("REDIS_HOST")
+	cfg.Redis.Port = os.Getenv("REDIS_PORT")
+	cfg.Redis.Password = os.Getenv("REDIS_PASSWORD")
+	cfg.Redis.DB, _ = strconv.Atoi("REDIS_DB")
+	cfg.JWT.SignKey = os.Getenv("JWT_SIGN_KEY")
+	cfg.Hasher.Salt = os.Getenv("HASHER_SALT")
+	cfg.Decoder.SecretKey = os.Getenv("SECRET_KEY")
+	cfg.Logger.LogFilePath = os.Getenv("LOG_FILE_PATH")
+	cfg.Logger.Level = os.Getenv("LOG_LVL")
+	cfg.Speller.URL = os.Getenv("SPELLER_URL")
+	return cfg, err
 }
 
 func parseUint16Env(key string) uint16 {
@@ -132,22 +102,3 @@ func parseUint16Env(key string) uint16 {
 	}
 	return uint16(val)
 }
-
-func parseIntEnv(key string) int {
-	val, err := strconv.Atoi(os.Getenv(key))
-	if err != nil {
-		log.Printf("failed to parse %s: %v/n", key, err)
-	}
-	return val
-}
-
-//func NewConfig() (*Config, error) {
-//	cfg := Config{}
-//	err := env.Parse(&cfg)
-//	cfg.Server.Address = fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port)
-//	if err != nil {
-//		return nil, fmt.Errorf("failed to parse config from environment variables: %w", err)
-//	}
-//
-//	return &cfg, nil
-//}
