@@ -21,6 +21,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"log"
+	"net"
 	"net/http"
 )
 
@@ -94,6 +95,11 @@ func main() {
 	yandexSpeller := speller.New(cfg.Speller.URL)
 
 	r := api.NewHandler(authService, noteService, decoder, logger, yandexSpeller)
+
+	server := http.Server{
+		Addr:    net.JoinHostPort("", cfg.Server.Port),
+		Handler: r,
+	}
 	logger.Info("Starting http server...")
-	logger.Fatal(http.ListenAndServe(cfg.Server.Port, r))
+	logger.Fatal(server.ListenAndServe())
 }

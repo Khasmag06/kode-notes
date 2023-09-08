@@ -6,7 +6,7 @@ services:
     env_file:
       - .env
     ports:
-      - "8080:8080"
+      - "${HTTP_PORT}:${HTTP_PORT}"
     depends_on:
       - redis
     restart: unless-stopped
